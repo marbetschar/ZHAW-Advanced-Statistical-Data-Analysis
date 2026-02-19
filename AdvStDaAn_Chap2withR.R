@@ -81,7 +81,7 @@ summary(mtc1.lm1)
 
 
 ## Residual and sensitivity analysis
-source("../../../Bs-StMo/MitR/RFn_Plot-lmSim.R")
+source("RFn_Plot-lmSim.R")
 par(mfrow=c(2,4))
 plot(mtc1.lm1)
 plot.lmSim(mtc1.lm1, SEED=4711)
