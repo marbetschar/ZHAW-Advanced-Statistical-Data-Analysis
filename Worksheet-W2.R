@@ -88,3 +88,56 @@ plot.lmSim(df.lm_c2, SEED=4711)
 ############
 
 # a)
+df <- read.table("data/Jet.dat", header = TRUE)
+
+# tukeys first aid transformations - we don't transform temperatures
+# because they can be negative.
+tdf <- data.frame(
+  lY = log(df2$Y),
+  lx1 = log(df2$x1),
+  lx2 = log(df2$x2),
+  lx3 = log(df2$x3),
+  lx4 = log(df2$x4),
+  x5 = df2$x5,
+  x6 = df2$x6
+)
+
+tdf.model1 <- lY ~ lx1 + lx2 + lx3 + lx4 + x5 + x6
+tdf.lm1 <- lm(tdf.model1, data=tdf)
+summary(tdf.lm1)
+par(mfrow=c(2,4))
+plot(tdf.lm1)
+plot.lmSim(tdf.lm1, SEED=4711)
+
+# !! data point 20 is too influential !!
+tdf_clean <- tdf[-20, ]
+tdf_clean.model1 <- lY ~ lx1 + lx2 + lx3 + lx4 + x5 + x6
+tdf_clean.lm1 <- lm(tdf_clean.model1, data=tdf_clean)
+summary(tdf_clean.lm1)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm1)
+plot.lmSim(tdf_clean.lm1, SEED=4711)
+
+# do variable selection:
+step(tdf_clean.lm1, scope = list(upper=tdf_clean.model1, lower=~1))
+# lY ~ lx1 + lx2 + x6
+
+tdf_clean.model2 <- lY ~ lx1 + lx2 + x6
+tdf_clean.lm2 <- lm(tdf_clean.model2, data=tdf_clean)
+summary(tdf_clean.lm2)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm2)
+plot.lmSim(tdf_clean.lm2, SEED=4711)
+# Residual plots look good, now check for multicolinearity:
+pairs(tdf_clean)
+car::vif(tdf_clean.lm2)
+
+# ups; multicolinearity is problematic! drop lx1?
+tdf_clean.model3 <- lY ~ lx2 + x6
+tdf_clean.lm3 <- lm(tdf_clean.model3, data=tdf_clean)
+summary(tdf_clean.lm3)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm3)
+plot.lmSim(tdf_clean.lm3, SEED=4711)
+pairs(tdf_clean)
+car::vif(tdf_clean.lm3)
