@@ -148,9 +148,10 @@ pairs(tdf_clean)
 car::vif(tdf_clean.lm3)
 # multicolinearity is still an issue; mean and diff doesn't work!
 
-# see whether the ratio of lx1+lx2 solves the issue:
-tdf_clean$lx.ratio <- tdf_clean$lx1 / tdf_clean$lx2
-tdf_clean.model4 <- lY ~ lx.ratio + x6
+# see whether x1+x2 mean and diff solves the issue:
+tdf_clean$x.mean <- (tdf_clean$x1 + tdf_clean$x2) / 2
+tdf_clean$x.diff <- tdf_clean$x1 - tdf_clean$x2
+tdf_clean.model4 <- lY ~ x.mean + x.diff + x6
 tdf_clean.lm4 <- lm(tdf_clean.model4, data=tdf_clean)
 summary(tdf_clean.lm4)
 par(mfrow=c(2,4))
@@ -158,11 +159,10 @@ plot(tdf_clean.lm4)
 plot.lmSim(tdf_clean.lm4, SEED=4711)
 pairs(tdf_clean)
 car::vif(tdf_clean.lm4)
-# now the vif looks good; but the scale location plot is not so nice
 
-# check if original scale ratio of x1 and x2 helps:
-tdf_clean$x.ratio <- tdf_clean$x1 / tdf_clean$x2
-tdf_clean.model5 <- lY ~ x.ratio + x6
+# multicollinearity is still a huge problem and x.diff is not significant;
+# lets see what happens if we drop it:
+tdf_clean.model5 <- lY ~ x.mean + x6
 tdf_clean.lm5 <- lm(tdf_clean.model5, data=tdf_clean)
 summary(tdf_clean.lm5)
 par(mfrow=c(2,4))
@@ -170,4 +170,15 @@ plot(tdf_clean.lm5)
 plot.lmSim(tdf_clean.lm5, SEED=4711)
 pairs(tdf_clean)
 car::vif(tdf_clean.lm5)
-# now the vif looks good; but the residual plots are garbage :(
+
+# lets also see what happens if we take log of x.mean:
+tdf_clean$x.lmean <- log(tdf_clean$x.mean)
+tdf_clean.model6 <- lY ~ x.lmean + x6
+tdf_clean.lm6 <- lm(tdf_clean.model6, data=tdf_clean)
+summary(tdf_clean.lm6)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm6)
+plot.lmSim(tdf_clean.lm6, SEED=4711)
+pairs(tdf_clean)
+car::vif(tdf_clean.lm6)
+# the residual plots now look even better!
