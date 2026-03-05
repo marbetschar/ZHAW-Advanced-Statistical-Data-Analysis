@@ -93,13 +93,15 @@ df <- read.table("data/Jet.dat", header = TRUE)
 # tukeys first aid transformations - we don't transform temperatures
 # because they can be negative.
 tdf <- data.frame(
-  lY = log(df2$Y),
-  lx1 = log(df2$x1),
-  lx2 = log(df2$x2),
-  lx3 = log(df2$x3),
-  lx4 = log(df2$x4),
-  x5 = df2$x5,
-  x6 = df2$x6
+  lY = log(df$Y),
+  lx1 = log(df$x1),
+  lx2 = log(df$x2),
+  lx3 = log(df$x3),
+  lx4 = log(df$x4),
+  x1 = df$x1,
+  x2 = df$x2,
+  x5 = df$x5,
+  x6 = df$x6
 )
 
 tdf.model1 <- lY ~ lx1 + lx2 + lx3 + lx4 + x5 + x6
@@ -128,12 +130,15 @@ summary(tdf_clean.lm2)
 par(mfrow=c(2,4))
 plot(tdf_clean.lm2)
 plot.lmSim(tdf_clean.lm2, SEED=4711)
-# Residual plots look good, now check for multicolinearity:
+# Residual plots look good, now check for multicollinearity:
 pairs(tdf_clean)
 car::vif(tdf_clean.lm2)
+# ups; multicollinearity is problematic!
 
-# ups; multicolinearity is problematic! drop lx1?
-tdf_clean.model3 <- lY ~ lx2 + x6
+# see whether lx1+lx2 mean and diff solves the issue:
+tdf_clean$lx.mean <- (tdf_clean$lx1 + tdf_clean$lx2) / 2
+tdf_clean$lx.diff <- tdf_clean$lx1 - tdf_clean$lx2
+tdf_clean.model3 <- lY ~ lx.mean + lx.diff + x6
 tdf_clean.lm3 <- lm(tdf_clean.model3, data=tdf_clean)
 summary(tdf_clean.lm3)
 par(mfrow=c(2,4))
@@ -141,3 +146,28 @@ plot(tdf_clean.lm3)
 plot.lmSim(tdf_clean.lm3, SEED=4711)
 pairs(tdf_clean)
 car::vif(tdf_clean.lm3)
+# multicolinearity is still an issue; mean and diff doesn't work!
+
+# see whether the ratio of lx1+lx2 solves the issue:
+tdf_clean$lx.ratio <- tdf_clean$lx1 / tdf_clean$lx2
+tdf_clean.model4 <- lY ~ lx.ratio + x6
+tdf_clean.lm4 <- lm(tdf_clean.model4, data=tdf_clean)
+summary(tdf_clean.lm4)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm4)
+plot.lmSim(tdf_clean.lm4, SEED=4711)
+pairs(tdf_clean)
+car::vif(tdf_clean.lm4)
+# now the vif looks good; but the scale location plot is not so nice
+
+# check if original scale ratio of x1 and x2 helps:
+tdf_clean$x.ratio <- tdf_clean$x1 / tdf_clean$x2
+tdf_clean.model5 <- lY ~ x.ratio + x6
+tdf_clean.lm5 <- lm(tdf_clean.model5, data=tdf_clean)
+summary(tdf_clean.lm5)
+par(mfrow=c(2,4))
+plot(tdf_clean.lm5)
+plot.lmSim(tdf_clean.lm5, SEED=4711)
+pairs(tdf_clean)
+car::vif(tdf_clean.lm5)
+# now the vif looks good; but the residual plots are garbage :(
