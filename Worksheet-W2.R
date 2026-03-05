@@ -4,9 +4,14 @@ library(car)
 
 source("RFn_Plot-lmSim.R")
 
+############
+# Exercise 1
+############
+
 df <- read.table("data/sniffer.dat", header = TRUE)
 str(df)
 summary(df)
+pairs(df)
 
 # a)
 # Y ∼ Temp.Tank + Temp.Gas + Vapor.Tank + Vapor.Dispensed
@@ -38,9 +43,48 @@ plot.lmSim(df.lm_a, SEED=4711)
 
 # b) Start from the model fitted in part (a) and perform a variable selection
 # using the AIC stepwise.
-df.vs <- step(df.lm_a, scope=list(
-  loser=~1,
+df.vs_a <- step(df.lm_a, scope=list(
+  lower=~1,
   upper=~df$Temp.Tank + df$Temp.Gas + df$Vapor.Tank + df$Vapor.Dispensed
 ))
 # Report and discuss the result:
-# -> 
+# -> we do have the lowest AIC if all of the predictors are removed!?
+
+# c) no, we did not remedy the multicollinearity deficiencies by the variable
+# selection. So we are now fixing it by using mean and difference:
+# check multicollinearity by inspecting the pairs:
+pairs(df)
+
+df$Temp.Diff <- df$Temp.Gas - df$Temp.Tank
+df$Temp.Mean <- (df$Temp.Gas + df$Temp.Tank) / 2
+df$Vapor.Diff <- df$Vapor.Dispensed - df$Vapor.Tank
+df$Vapor.Mean <- (df$Vapor.Dispensed + df$Vapor.Tank) / 2
+
+# check multicollinearity again by inspecting the pairs:
+pairs(df)
+# -> Vapor.Diff and Vapor.Mean are less correlated than Vapor.Tank
+# and Vapor Dispensed, so we use them instead. Temp.Tank and Temp.Gas
+# look less correlated by default, so we keep them:
+df.model_c1 <- df$Y ~ df$Temp.Tank + df$Temp.Gas + df$Vapor.Mean + df$Vapor.Diff
+df.lm_c1 <- lm(df.model_c1, data=df)
+summary(df.lm_c1)
+car::vif(df.lm_c1)
+
+# Drop: df$Temp.Tank
+df.model_c2 <- df$Y ~ df$Temp.Gas + df$Vapor.Mean + df$Vapor.Diff
+df.lm_c2 <- lm(df.model_c2, data=df)
+summary(df.lm_c2)
+car::vif(df.lm_c2)
+par(mfrow=c(2,4))
+plot(df.lm_c2)
+plot.lmSim(df.lm_c2, SEED=4711)
+# -> everything looks good now!
+
+# Interpretation
+# ...?
+
+############
+# Exercise 2
+############
+
+# a)
