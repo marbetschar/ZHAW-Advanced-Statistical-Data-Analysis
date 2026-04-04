@@ -85,11 +85,11 @@ lib.lmSim(dar.lm1)
 # Count Data: sqrt(x)
 # Counted Fractions / Shares: logit(x)
 dar_t <- data.frame(
-  RDR = log(dar$RDR),
-  VH = log(dar$VH),
-  HR = sqrt(dar$HR),
-  F = log(dar$F),
-  POP = log(dar$POP),
+  RDR = sqrt(dar$RDR),
+  VH = sqrt(dar$VH),
+  HR = dar$HR,
+  F = dar$F,
+  POP = sqrt(dar$POP),
   AR = log(dar$AR),
   IND = dar$IND
 )
@@ -107,3 +107,26 @@ summary(dar_t.gam1)
 dar_t.rlm <- lmrob(RDR ~ lo(VH) + lo(HR) + lo(F) + lo(POP) + lo(AR) + IND, data = dar_t)
 summary(dar_t.rlm)
 lib.lmSim(dar_t.rlm)
+# => "3 observations c(1,45,53) are outliers with |weight| = 0 ( < 0.0019);" !
+
+# remove outlier observations:
+dar_tclean <- dar_t[-c(1, 45, 53), ]
+
+# c4) fit ordinary linear regression model again:
+dar_tclean.lm1 <- lm(RDR ~ VH + HR + F + POP + AR + IND, data = dar_tclean)
+summary(dar_tclean.lm1)
+# Inspect the residuals:
+lib.lmSim(dar_tclean.lm1)
+
+# d)
+dar_d <- data.frame(
+  RDR = dar$RDR,
+  VH = log(dar$VH),
+  HR = log(dar$HR),
+  F = log(dar$F),
+  POP = log(dar$POP),
+  AR = log(dar$AR),
+  IND = dar$IND
+)
+dar_d.glm1 <- glm(RDR ~ POP + AR + HR + VH + F + IND, family=poisson, data=dar_d)
+summary(dar_d.glm1)
