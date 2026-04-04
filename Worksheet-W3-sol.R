@@ -132,7 +132,7 @@ plot(x2 ~ x1, data=SyD)
 ## ~~~~~~~~~~
 
 
-PP1 <- read.table("PrestigeP1.dat", header=TRUE, stringsAsFactors=TRUE)
+PP1 <- read.table("./data/PrestigeP1.dat", header=TRUE, stringsAsFactors=TRUE)
 ##
 ## (a)
 ## (a-i) Fitting an additive model:

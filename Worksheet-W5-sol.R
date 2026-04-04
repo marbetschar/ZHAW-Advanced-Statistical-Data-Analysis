@@ -22,7 +22,7 @@
 ##
 ## Question 2
 ## ~~~~~~~~~
-DaR <- read.table("Data/Dial-a-ride.dat", header=T, stringsAsFactors=TRUE)
+DaR <- read.table("./data/Dial-a-ride.dat", header=T, stringsAsFactors=TRUE)
 str(DaR)
 
 
@@ -46,7 +46,7 @@ which((DaR$AR > 200) | (DaR$RDR > 1500)) ## 1 33 35 40 53
 DaR.lm1 <- lm(RDR ~ POP + AR + HR + VH + F + IND, data=DaR)
 
 ## Residual and Sensitivity Analysis
-source("RFn/RFn_Plot-lmSim.R")
+source("RFn_Plot-lmSim.R")
 par(mfrow=c(2,4))
 plot(DaR.lm1)
 plot.lmSim(DaR.lm1, SEED=1848)
