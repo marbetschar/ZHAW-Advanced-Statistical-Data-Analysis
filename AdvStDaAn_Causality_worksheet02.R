@@ -58,11 +58,11 @@ querygrain(gn.toys, nodes = c("Toy", "Gender"), type = "joint")
 
 # a) Build a Bayesian network with R using the given conditional probabilities.
 # Visualize the resulting causal diagram.
-cpt.sun <- cptable.validated(c("Sun"), levels = c("little", "much"), values = c(0.7, 0.3))
-cpt.water <- cptable.validated(c("Water", "Sun"), levels = c("little", "much"), values = c(0.05, 0.95, 0.65, 0.35))
-cpt.height <- cptable.validated(c("Height", "Sun", "Water"), levels = c("little", "much"), values = c(0.4, 0.6, 0.45, 0.55, 0.55, 0.45, 0.25, 0.75))
-cpt.parasites <- cptable.validated(c("Parasites"), levels = c("yes", "no"), values = c(0.18, 0.82))
-cpt.crop <- cptable.validated(c("Crop", "Height", "Parasites"), levels = c("low", "high"), values = c(0.67, 0.33, 0.01, 0.99, 0.9, 0.1, 0.42, 0.58))
+cpt.sun <- lib.cptable(c("Sun"), levels = c("little", "much"), values = c(0.7, 0.3))
+cpt.water <- lib.cptable(c("Water", "Sun"), levels = c("little", "much"), values = c(0.05, 0.95, 0.65, 0.35))
+cpt.height <- lib.cptable(c("Height", "Sun", "Water"), levels = c("little", "much"), values = c(0.4, 0.6, 0.45, 0.55, 0.55, 0.45, 0.25, 0.75))
+cpt.parasites <- lib.cptable(c("Parasites"), levels = c("yes", "no"), values = c(0.18, 0.82))
+cpt.crop <- lib.cptable(c("Crop", "Height", "Parasites"), levels = c("low", "high"), values = c(0.67, 0.33, 0.01, 0.99, 0.9, 0.1, 0.42, 0.58))
 
 cpt.apple_tree <- compileCPT(list(cpt.sun, cpt.water, cpt.height, cpt.parasites, cpt.crop))
 gn.apple_tree <- grain(cpt.apple_tree, compile = FALSE)

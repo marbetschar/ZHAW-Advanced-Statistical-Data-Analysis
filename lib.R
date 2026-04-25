@@ -56,7 +56,7 @@ lib.plot <- function(model, ...) {
   par(mfrow = c(1, 1))
 }
 
-cptable.validated <- function(vpar, levels = NULL, values = NULL,
+lib.cptable <- function(vpar, levels = NULL, values = NULL,
                             normalize = TRUE, smooth = 0) {
   if (is.null(values)) {
     stop("'values' must be provided.")
