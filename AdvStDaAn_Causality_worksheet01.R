@@ -5,13 +5,13 @@ library(gRbase)
 # Exercise 1
 ############
 
-g <- dag("A",
-         c("C", "D", "B", "A"),
-         c("C", "B", "A"),
-         c("C", "A"),
-         c("B", "E"),
-         c("B", "A"),
-         c("D", "B"))
+g <- dag(
+  c("A"),
+  c("B", "A", "E"), # = root node + all incoming node-edges
+  c("C", "A", "B", "D"),
+  c("D", "B"),
+  c("E")
+)
 plot(g)
 
 # a)
